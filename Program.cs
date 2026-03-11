@@ -19,6 +19,7 @@ class Program
 {
     static void Main(string[] args)
     {
+        // Définition des méthodes différentes
         static void displayCompte(Compte c)
         {
             Console.WriteLine($"{c.Num} /{c.nom} /{c.solde}");
@@ -42,15 +43,64 @@ class Program
             displayCompte(c);
             Console.WriteLine("Fin de crédit");
         }
+
         static void debit(Compte c, double montant)
         {
-            Console.WriteLine("Procédure de débit");
-            displayCompte(c);
-            c.solde -= montant;
-            displayCompte(c);
-            Console.WriteLine("Fin de débit");
+            if (verif(c,montant))
+            {
+                Console.WriteLine("Procédure de débit");
+                displayCompte(c);
+                c.solde -= montant;
+                displayCompte(c);
+                Console.WriteLine("Fin de débit");
+            }
+            else
+            {
+                Console.WriteLine("Débit impossible à réaliser, solde insuffisant");
+            }
+        }
+        static void transfert(Compte source, Compte destination, double montant)
+        {
+            if (source != destination)
+            {
+                if (verif(source, montant))
+                {
+                    Console.WriteLine("Montant pré-transfert :");
+                    displayCompte(source);
+                    displayCompte(destination);
+
+                    source.solde -= montant;
+                    destination.solde += montant;
+
+                    Console.WriteLine("Montant post-transfert :");
+                    displayCompte(source);
+                    displayCompte(destination);
+                }
+                else
+                {
+                    Console.WriteLine("Transfert impossible à réaliser, solde insuffisant");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Transfert impossible à réaliser, source identique à la destination.");
+            }
         }
 
+        // Contrôles et validations
+        static bool verif(Compte c, double montant)
+        {
+            if (c.solde - montant > -200)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        // Dans MAIN
         Compte compte1 = new Compte(1, "Sebastien Puduglen", 2500.8);
         Compte compte2 = new Compte(2, "Jeanne Pudlashat", 15000.35);
         Compte compte3 = new Compte(3, "Harry Shlingzboub", 6500.50);
@@ -61,6 +111,7 @@ class Program
         BDDBank.Add(compte3);
         displayBDD(BDDBank);
 
+        // Référence VS Copie
         Compte compte4 = compte1;
         Console.WriteLine("Avant crédit compte 1 500 euros");
         Console.WriteLine("Compte 1");
@@ -78,6 +129,11 @@ class Program
         displayCompte(compte1);
         Console.WriteLine("Compte 4");
         displayCompte(compte4);
-        // ici, les deux comptes partagent la même valeur constamment.
+        //!\ CONSTAT : Ici, les deux comptes partagent la même valeur constamment.
+
+        transfert(compte2, compte3, 50000);
+        transfert(compte2, compte3, 50);
+        transfert(compte2, compte3, 15150);
+        transfert(compte2, compte3, 2);
     }
 }
